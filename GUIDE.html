@@ -1,0 +1,1206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>matrix study and eval guide</title>
+<style>
+:root {
+  --bg: #fbfbfa;
+  --panel: #ffffff;
+  --ink: #1b1b19;
+  --muted: #6b6b66;
+  --line: #e2e2dd;
+  --accent: #b4513a;
+  --accent-soft: #fbf0ed;
+  --good: #2f6f4f;
+  --good-soft: #eaf4ee;
+  --warn: #8a5a12;
+  --warn-soft: #fbf3e4;
+  --code-bg: #f4f4f1;
+  --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14140f;
+    --panel: #1c1c18;
+    --ink: #e8e6df;
+    --muted: #9a978c;
+    --line: #302f28;
+    --accent: #e08b6f;
+    --accent-soft: #2a1f1a;
+    --good: #7fc39a;
+    --good-soft: #1a2620;
+    --warn: #d9ab5f;
+    --warn-soft: #2a2116;
+    --code-bg: #232320;
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 64px; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 16px/1.62 var(--sans);
+  -webkit-text-size-adjust: 100%;
+}
+.wrap { max-width: 820px; margin: 0 auto; padding: 0 20px 96px; }
+
+header.top { border-bottom: 1px solid var(--line); background: var(--panel); }
+header.top .wrap { padding-top: 40px; padding-bottom: 28px; }
+.kicker {
+  font: 600 12px/1 var(--mono);
+  letter-spacing: .14em; text-transform: uppercase; color: var(--accent);
+}
+h1 { font-size: 32px; line-height: 1.2; margin: 12px 0 8px; letter-spacing: -.02em; }
+.sub { color: var(--muted); margin: 0; max-width: 62ch; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.chip {
+  font: 500 12px/1 var(--mono); padding: 6px 10px;
+  border: 1px solid var(--line); border-radius: 999px;
+  color: var(--muted); white-space: nowrap;
+}
+.chip.ok { color: var(--good); border-color: var(--good); background: var(--good-soft); }
+
+nav.toc {
+  position: sticky; top: 0; z-index: 20;
+  background: var(--panel); border-bottom: 1px solid var(--line);
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+}
+nav.toc ol {
+  display: flex; gap: 2px; margin: 0 auto; padding: 0 20px;
+  list-style: none; max-width: 820px;
+}
+nav.toc a {
+  display: block; padding: 12px 10px; font: 500 13px/1 var(--sans);
+  color: var(--muted); text-decoration: none; white-space: nowrap;
+  border-bottom: 2px solid transparent;
+}
+nav.toc a:hover { color: var(--ink); }
+nav.toc a.on { color: var(--accent); border-bottom-color: var(--accent); }
+
+section { padding-top: 44px; }
+h2 { font-size: 22px; margin: 0 0 4px; letter-spacing: -.01em; display: flex; align-items: baseline; gap: 10px; }
+h2 .n { font: 600 13px/1 var(--mono); color: var(--accent); }
+.lede { color: var(--muted); margin: 0 0 20px; }
+h3 { font-size: 16px; margin: 26px 0 8px; }
+p { margin: 0 0 14px; }
+ul, ol.body { margin: 0 0 14px; padding-left: 22px; }
+li { margin-bottom: 6px; }
+code { font: 13px/1.5 var(--mono); background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+pre {
+  background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px;
+  padding: 14px 16px; overflow-x: auto; margin: 0 0 6px;
+}
+pre code { background: none; padding: 0; font-size: 13px; }
+.src { font: 500 11px/1 var(--mono); color: var(--muted); margin: 0 0 18px; display: block; }
+.eq {
+  background: var(--panel); border: 1px solid var(--line);
+  border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0;
+  padding: 14px 18px; margin: 0 0 6px; font: 15px/1.7 var(--mono); overflow-x: auto;
+}
+.eq b { color: var(--accent); font-weight: 600; }
+.eq-note { color: var(--muted); font-size: 14px; margin: 0 0 20px; padding-left: 3px; }
+
+.box { border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; margin: 0 0 18px; background: var(--panel); }
+.box.good { border-color: var(--good); background: var(--good-soft); }
+.box.warn { border-color: var(--warn); background: var(--warn-soft); }
+.box.accent { border-color: var(--accent); background: var(--accent-soft); }
+.box h4 { margin: 0 0 8px; font-size: 14px; }
+.box p:last-child, .box ul:last-child { margin-bottom: 0; }
+
+.tablewrap { overflow-x: auto; margin: 0 0 18px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 480px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+td code { font-size: 12px; }
+td.ok { color: var(--good); }
+
+details.qa { border: 1px solid var(--line); border-radius: 8px; margin-bottom: 8px; background: var(--panel); }
+details.qa > summary {
+  cursor: pointer; padding: 12px 16px; font-weight: 500; list-style: none;
+  display: flex; gap: 10px; align-items: flex-start;
+}
+details.qa > summary::-webkit-details-marker { display: none; }
+details.qa > summary::before {
+  content: "?"; font: 600 12px/18px var(--mono);
+  min-width: 18px; height: 18px; text-align: center; border-radius: 4px;
+  background: var(--accent-soft); color: var(--accent); margin-top: 2px;
+}
+details.qa[open] > summary { border-bottom: 1px solid var(--line); }
+details.qa[open] > summary::before { content: "!"; }
+.answer { padding: 14px 16px 4px 44px; }
+.answer p:last-child, .answer ul:last-child { margin-bottom: 12px; }
+.qa-hint { font-size: 13px; color: var(--muted); margin: 0 0 16px; padding: 10px 14px; border: 1px dashed var(--line); border-radius: 8px; }
+
+.pg { border: 1px solid var(--line); border-radius: 10px; background: var(--panel); overflow: hidden; }
+.pg-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+button {
+  font: 500 13px/1 var(--sans); padding: 8px 14px; border: 1px solid var(--line);
+  background: var(--bg); color: var(--ink); border-radius: 7px; cursor: pointer;
+}
+button:hover { border-color: var(--accent); color: var(--accent); }
+button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+button.primary:hover { opacity: .88; color: #fff; }
+select, textarea {
+  font: 13px/1.5 var(--mono); color: var(--ink); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 7px; padding: 8px 10px; width: 100%;
+}
+textarea { resize: vertical; min-height: 78px; white-space: pre; overflow-wrap: normal; overflow-x: auto; }
+.pg-body { padding: 14px; }
+.pg-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.field label { display: block; font: 500 11px/1 var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+.hint { font-size: 13px; color: var(--muted); margin: 0 0 12px; }
+.out { border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; background: var(--bg); }
+.out h5 { margin: 0 0 8px; font: 600 11px/1 var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.mat { font: 13px/1.5 var(--mono); overflow-x: auto; }
+.mat .row { white-space: pre; }
+.mat .piv { color: var(--accent); font-weight: 700; }
+.err { color: var(--warn); font: 13px/1.5 var(--mono); }
+.trace { margin-top: 12px; }
+.step { border-top: 1px solid var(--line); padding: 10px 0 2px; }
+.step .op { font: 500 12px/1.5 var(--mono); color: var(--accent); margin-bottom: 6px; }
+.cplx { font: 500 12px/1 var(--mono); color: var(--muted); margin-top: 10px; }
+@media (max-width: 640px) { .pg-inputs { grid-template-columns: 1fr; } h1 { font-size: 26px; } }
+
+.check { border: 1px solid var(--line); border-radius: 10px; background: var(--panel); overflow: hidden; }
+.check-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.check-head .prog { font: 600 13px/1 var(--mono); color: var(--accent); }
+.check ul { list-style: none; margin: 0; padding: 6px 0; }
+.check li { margin: 0; }
+.check label { display: flex; gap: 11px; align-items: flex-start; padding: 9px 16px; cursor: pointer; font-size: 14px; }
+.check label:hover { background: var(--accent-soft); }
+.check input { margin-top: 4px; accent-color: var(--accent); width: 15px; height: 15px; flex: none; }
+.check input:checked + span { color: var(--muted); text-decoration: line-through; }
+.bar { height: 3px; background: var(--line); }
+.bar i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .2s; }
+footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="kicker">42 Abu Dhabi &middot; data science branch</div>
+    <h1>matrix</h1>
+    <p class="sub">Study and evaluation guide. Enter the Matrix: linear algebra written from
+    scratch, the complexity bounds the peer review actually checks, and the two explanations the
+    subject demands out loud.</p>
+    <div class="meta">
+      <span class="chip ok">ex00 to ex13 done and verified</span>
+      <span class="chip">Subject v1.2</span>
+      <span class="chip">No math library</span>
+      <span class="chip">228 lines of Python</span>
+      <span class="chip">Field K = f32</span>
+    </div>
+  </div>
+</header>
+
+<nav class="toc">
+  <ol>
+    <li><a href="#what">What it is</a></li>
+    <li><a href="#math">The math</a></li>
+    <li><a href="#map">Code map</a></li>
+    <li><a href="#walk">Walkthrough</a></li>
+    <li><a href="#play">Playground</a></li>
+    <li><a href="#run">Run and verify</a></li>
+    <li><a href="#defense">Eval defense</a></li>
+    <li><a href="#traps">Traps</a></li>
+    <li><a href="#checklist">Checklist</a></li>
+  </ol>
+</nav>
+
+<main class="wrap">
+
+<section id="what">
+  <h2><span class="n">01</span> What this project is</h2>
+  <p class="lede">Fourteen exercises that look like fourteen problems and are really about four.</p>
+
+  <p>You build a <code>Vector</code> and a <code>Matrix</code> type over the real numbers and
+  implement every core operation of linear algebra without touching a maths library. Not even the
+  one in your standard library, unless a specific exercise says otherwise.</p>
+
+  <p>The trick to seeing this project clearly: the last four exercises are one algorithm.
+  Row echelon form, determinant, inverse and rank are all Gaussian elimination with a different
+  thing recorded on the way down. Once you have the elimination engine, ex10 to ex13 cost you a
+  few lines each.</p>
+
+  <div class="box accent">
+    <h4>What is actually graded</h4>
+    <p>Correct output is the easy half. The subject states that the time and space complexity of
+    every exercise <b>will be checked during peer review</b>, and it names two explanations you
+    must be able to give out loud: what happens when the determinant is zero, what the determinant
+    means geometrically, and what the rank represents. Those are in section 7. Prepare them like
+    exam answers, because that is what they are.</p>
+  </div>
+</section>
+
+<section id="math">
+  <h2><span class="n">02</span> The math</h2>
+  <p class="lede">A vector space, a linear map, and one elimination algorithm that answers four questions.</p>
+
+  <h3>Vectors and linear combination</h3>
+  <div class="eq">linear_combination(v&#8321;..v&#8342;, c&#8321;..c&#8342;) = <b>c&#8321;v&#8321; + c&#8322;v&#8322; + ... + c&#8342;v&#8342;</b></div>
+  <p class="eq-note">Everything in the module is built on this. Addition and scaling are the two
+  axioms of a vector space; a linear combination is just both at once. The subject allows a fused
+  multiply-add here, which is exactly the shape of the inner loop: accumulate
+  <code>out[i] += v[i] * c</code>.</p>
+
+  <h3>Dot product and the three norms</h3>
+  <div class="eq">u &middot; v = <b>&sum; u&#7522;v&#7522;</b>
+<br><br>&#8214;v&#8214;&#8321; = &sum; |v&#7522;| &nbsp;&nbsp;(taxicab)
+<br>&#8214;v&#8214;&#8322; = ( &sum; v&#7522;&sup2; )<sup>1/2</sup> &nbsp;&nbsp;(euclidean)
+<br>&#8214;v&#8214;<sub>&infin;</sub> = max |v&#7522;| &nbsp;&nbsp;(supremum)</div>
+  <p class="eq-note">These are the only three exercises where extra functions are allowed, and
+  only on ex04: the subject permits <code>pow</code> and <code>max</code> there and nowhere else.
+  That is why <code>norm()</code> uses <code>** 0.5</code> and <code>norm_inf()</code> uses
+  <code>max</code>, and why nothing else in the file does.</p>
+
+  <h3>Cosine and cross product</h3>
+  <div class="eq">cos(&theta;) = <b>(u &middot; v) / ( &#8214;u&#8214; &#8214;v&#8214; )</b>
+<br><br>u &times; v = ( u&#8322;v&#8323; &minus; u&#8323;v&#8322;, &nbsp; u&#8323;v&#8321; &minus; u&#8321;v&#8323;, &nbsp; u&#8321;v&#8322; &minus; u&#8322;v&#8321; )</div>
+  <p class="eq-note">The cosine is the dot product with the lengths divided out, so it measures
+  direction alone. The cross product only exists in three dimensions and returns a vector
+  perpendicular to both, with length equal to the area of the parallelogram they span.</p>
+
+  <h3>A matrix is a linear map</h3>
+  <div class="eq">(Au)&#7522; = <b>&sum;&#11388; A&#7522;&#11388; u&#11388;</b> &nbsp;&nbsp;&nbsp; (AB)&#7522;&#11388; = <b>&sum;&#8342; A&#7522;&#8342; B&#8342;&#11388;</b></div>
+  <p class="eq-note">This is the idea the whole module turns on. A matrix is not a grid of
+  numbers, it is a function that eats a vector and returns a vector, and it does so linearly.
+  Matrix multiplication is defined the way it is precisely so that <code>AB</code> is the map you
+  get by doing <code>B</code> first and then <code>A</code>.</p>
+
+  <h3>Gaussian elimination, the one algorithm</h3>
+  <p>Three row operations leave the solution set of a linear system unchanged: swap two rows,
+  multiply a row by a nonzero scalar, add a multiple of one row to another. Apply them
+  systematically and any matrix reduces to reduced row echelon form: a leading 1 in each nonzero
+  row, moving right as you go down, and zeros everywhere else in a pivot column.</p>
+
+  <div class="tablewrap">
+  <table>
+    <tr><th>Exercise</th><th>What you record while eliminating</th></tr>
+    <tr><td>ex10 row echelon</td><td>The reduced matrix itself.</td></tr>
+    <tr><td>ex11 determinant</td><td>The product of the pivots, with a sign flip per row swap.</td></tr>
+    <tr><td>ex12 inverse</td><td>The same operations applied to an identity matrix glued on the right.</td></tr>
+    <tr><td>ex13 rank</td><td>How many nonzero rows survive.</td></tr>
+  </table>
+  </div>
+
+  <h3>The determinant, geometrically</h3>
+  <div class="eq">det(A) = <b>the signed factor by which A scales volume</b></div>
+  <p class="eq-note">Feed the unit square, or unit cube, through the map <code>A</code>. The
+  determinant is the area, or volume, of what comes out. A negative determinant means the map also
+  flipped orientation, turning a right-handed frame into a left-handed one. This is the answer the
+  subject explicitly asks for at the defense.</p>
+
+  <div class="box good">
+    <h4>What det(A) = 0 means</h4>
+    <p>The map squashes space into a lower dimension: a volume becomes a flat sheet, an area
+    becomes a line. Information is destroyed, so the map cannot be undone, so <b>the matrix has no
+    inverse</b>. Equivalently: the columns are linearly dependent, the rank is less than
+    <code>n</code>, and the homogeneous system <code>Ax = 0</code> has solutions other than zero.
+    All five statements are the same statement.</p>
+  </div>
+
+  <h3>Rank</h3>
+  <div class="eq">rank(A) = <b>the dimension of the image of A</b> = the number of linearly independent columns</div>
+  <p class="eq-note">How many dimensions survive the map. A 3&times;3 matrix of rank 2 sends all of
+  space onto a plane. Counting nonzero rows of the row echelon form gives it, because elimination
+  preserves the row space and leaves exactly one row per independent direction. The subject asks
+  for this one out loud too.</p>
+</section>
+
+<section id="map">
+  <h2><span class="n">03</span> Code map</h2>
+  <p class="lede">Two classes, four free functions, 228 lines, zero imports.</p>
+
+  <div class="tablewrap">
+  <table>
+    <tr><th>Exercise</th><th>Where</th><th>Subject time bound</th><th>Subject space bound</th></tr>
+    <tr><td>ex00 add, sub, scl</td><td><code>matrix.py:20</code>, <code>:78</code></td><td>O(n)</td><td>O(n)</td></tr>
+    <tr><td>ex01 linear_combination</td><td><code>matrix.py:202</code></td><td>O(n)</td><td>O(n)</td></tr>
+    <tr><td>ex02 lerp</td><td><code>matrix.py:212</code></td><td>O(n)</td><td>O(n)</td></tr>
+    <tr><td>ex03 dot</td><td><code>matrix.py:46</code></td><td>O(n)</td><td>O(n)</td></tr>
+    <tr><td>ex04 norm_1, norm, norm_inf</td><td><code>matrix.py:50</code></td><td>O(n)</td><td>O(n)</td></tr>
+    <tr><td>ex05 angle_cos</td><td><code>matrix.py:217</code></td><td>O(n)</td><td>O(n)</td></tr>
+    <tr><td>ex06 cross_product</td><td><code>matrix.py:222</code></td><td>N/A</td><td>N/A</td></tr>
+    <tr><td>ex07 mul_vec</td><td><code>matrix.py:106</code></td><td>O(nm)</td><td>O(nm)</td></tr>
+    <tr><td>ex07 mul_mat</td><td><code>matrix.py:109</code></td><td>O(nmp)</td><td>O(nm + mp + np)</td></tr>
+    <tr><td>ex08 trace</td><td><code>matrix.py:121</code></td><td>O(n)</td><td>N/A</td></tr>
+    <tr><td>ex09 transpose</td><td><code>matrix.py:125</code></td><td>O(nm)</td><td>O(nm)</td></tr>
+    <tr><td>ex10 row_echelon</td><td><code>matrix.py:130</code></td><td>O(n&sup3;)</td><td>O(n&sup2;)</td></tr>
+    <tr><td>ex11 determinant</td><td><code>matrix.py:157</code></td><td>O(n&sup3;)</td><td>O(n&sup2;)</td></tr>
+    <tr><td>ex12 inverse</td><td><code>matrix.py:176</code></td><td>O(n&sup3;)</td><td>O(n&sup2;)</td></tr>
+    <tr><td>ex13 rank</td><td><code>matrix.py:193</code></td><td>O(n&sup3;)</td><td>N/A</td></tr>
+  </table>
+  </div>
+
+  <p><code>test_matrix.py</code> holds every worked example printed in the subject, at tolerance
+  <code>1e-4</code>, and doubles as the runnable main the subject requires for each exercise.</p>
+
+  <div class="box">
+    <h4>Allowed mathematical functions, exercise by exercise</h4>
+    <p>The subject sets this per exercise, and it is stricter than most students notice.
+    <code>ex00</code>, <code>ex08</code>, <code>ex09</code>, <code>ex10</code> and
+    <code>ex13</code> allow <b>none</b>. Most others allow only the fused multiply-add.
+    <b>Only ex04 allows <code>pow</code> and <code>max</code>.</b> That single line is why the
+    norms are the only place in <code>matrix.py</code> using <code>** 0.5</code> or
+    <code>max</code> on values.</p>
+  </div>
+</section>
+
+<section id="walk">
+  <h2><span class="n">04</span> Walkthrough</h2>
+  <p class="lede">Skip the easy ones. The elimination engine is the project.</p>
+
+  <h3>The shape of the easy exercises</h3>
+  <pre><code>    # --- ex03: dot product (O(n)) ---
+    def dot(self, v):
+        return sum(a * b for a, b in zip(self.data, v.data))</code></pre>
+  <span class="src">matrix.py:45-47</span>
+  <p>One pass, one accumulator, <code>O(n)</code>. Every exercise from ex00 to ex09 has this
+  shape. If any of them contains a nested loop over the same dimension, the complexity bound is
+  broken, and that is the thing the peer review checks.</p>
+
+  <pre><code># --- ex02: linear interpolation, generic over scalars / vectors / matrices ---
+def lerp(u, v, t):
+    return u + (v - u) * t</code></pre>
+  <span class="src">matrix.py:211-213</span>
+  <p>One line, and it works for scalars, vectors and matrices alike, because <code>Vector</code>
+  and <code>Matrix</code> both define <code>__add__</code>, <code>__sub__</code> and
+  <code>__mul__</code>. This is what the subject means by writing the module generically: the
+  function does not know or care which type it received.</p>
+
+  <h3>Reduced row echelon form</h3>
+  <pre><code>    def row_echelon(self):
+        a = self._copy()
+        rows = len(a)
+        cols = len(a[0]) if rows else 0
+        lead = 0
+        for r in range(rows):
+            if lead &gt;= cols:
+                break
+            i = r
+            while abs(a[i][lead]) &lt; EPS:
+                i += 1
+                if i == rows:
+                    i = r
+                    lead += 1
+                    if lead == cols:
+                        return Matrix(a)
+            a[i], a[r] = a[r], a[i]
+            piv = a[r][lead]
+            a[r] = [x / piv for x in a[r]]
+            for i in range(rows):
+                if i != r:
+                    f = a[i][lead]
+                    a[i] = [a[i][c] - f * a[r][c] for c in range(cols)]
+            lead += 1
+        return Matrix(a)</code></pre>
+  <span class="src">matrix.py:129-154</span>
+  <p>Read it as four moves per pivot row. Find a row whose entry in the lead column is not zero,
+  scanning down and stepping the lead column right if the whole column is zero. Swap it up into
+  position. Divide the row by its pivot so the pivot becomes 1. Subtract multiples of it from
+  <b>every other row</b>, above and below, so the rest of that column becomes 0.</p>
+  <p>Subtracting from every row rather than only the rows below is what makes this the
+  <b>reduced</b> form rather than plain row echelon form. The subject's worked example expects the
+  reduced one. Three nested loops over <code>n</code> give <code>O(n&sup3;)</code>, and the single
+  working copy gives <code>O(n&sup2;)</code>.</p>
+
+  <div class="box warn">
+    <h4>Why the EPS comparison exists</h4>
+    <p><code>EPS = 1e-10</code> at <code>matrix.py:9</code>. Floating point subtraction rarely
+    leaves a clean <code>0.0</code>; it leaves something like <code>1e-17</code>. Testing
+    <code>a[i][lead] == 0</code> would then treat numerical dust as a real pivot, divide by it,
+    and produce garbage of magnitude <code>1e17</code>. Every zero test in the file goes through
+    <code>EPS</code> for that reason, and the subject anticipates it: it says results may be
+    approximate because numerical stability is hard.</p>
+  </div>
+
+  <h3>Determinant, the same loop with a product</h3>
+  <pre><code>            p = max(range(i, n), key=lambda r: abs(a[r][i]))
+            if abs(a[p][i]) &lt; EPS:
+                return 0.0
+            if p != i:
+                a[i], a[p] = a[p], a[i]
+                det = -det
+            det *= a[i][i]</code></pre>
+  <span class="src">matrix.py:162-168</span>
+  <p>Three things worth defending here. The determinant of a triangular matrix is the product of
+  its diagonal, so eliminating downward and multiplying pivots gives the answer. A row swap flips
+  the sign, which is why <code>det = -det</code> appears. And if any pivot column is entirely zero
+  below the diagonal, the matrix is singular and the determinant is exactly <code>0.0</code>, so
+  the function returns early.</p>
+  <p><b>Partial pivoting:</b> <code>max(range(i, n), key=...)</code> picks the row with the largest
+  absolute value in the pivot column, not merely the first nonzero one. Dividing by the largest
+  available pivot keeps the multipliers below 1 and stops rounding error from being amplified.
+  This is a numerical stability choice, and it is worth naming it as one.</p>
+
+  <h3>Inverse, the same loop on an augmented matrix</h3>
+  <pre><code>        aug = [self.rows[i][:] + [1.0 if j == i else 0.0 for j in range(n)] for i in range(n)]</code></pre>
+  <span class="src">matrix.py:178</span>
+  <p>Glue the identity onto the right of <code>A</code> to make an <code>n &times; 2n</code> block,
+  then run Gauss-Jordan on the whole thing. Whatever sequence of row operations turns the left
+  block into the identity turns the right block into <code>A&#8315;&sup1;</code>, because that
+  sequence <b>is</b> <code>A&#8315;&sup1;</code> expressed as operations. A singular matrix raises
+  <code>ValueError('matrix is singular, no inverse')</code>, which matches the subject's
+  requirement to return an error rather than a wrong answer.</p>
+
+  <h3>Rank, three lines on top of ex10</h3>
+  <pre><code>    def rank(self):
+        ref = self.row_echelon().rows
+        return sum(1 for row in ref if any(abs(x) &gt; EPS for x in row))</code></pre>
+  <span class="src">matrix.py:192-195</span>
+  <p>Elimination leaves one nonzero row per independent direction, so counting them gives the
+  rank. It reuses ex10 rather than repeating the elimination, which is both less code and the
+  honest way to show you understood that they are the same computation.</p>
+</section>
+
+<section id="play">
+  <h2><span class="n">05</span> Playground</h2>
+  <p class="lede">Every operation, ported from <code>matrix.py</code>. The elimination steps are
+  shown one row operation at a time, which is the fastest way to actually learn Gaussian
+  elimination.</p>
+
+  <div class="pg">
+    <div class="pg-bar">
+      <select id="op" style="max-width:340px"></select>
+      <button class="primary" id="btn-go">Compute</button>
+      <button id="btn-example">Load subject example</button>
+    </div>
+    <div class="pg-body">
+      <p class="hint" id="hint"></p>
+      <div class="pg-inputs">
+        <div class="field"><label id="lab-a">A</label><textarea id="in-a" spellcheck="false"></textarea></div>
+        <div class="field"><label id="lab-b">B</label><textarea id="in-b" spellcheck="false"></textarea></div>
+      </div>
+      <div class="field" id="wrap-t" style="margin-bottom:12px">
+        <label id="lab-t">Scalar</label>
+        <textarea id="in-t" spellcheck="false" style="min-height:0;height:38px"></textarea>
+      </div>
+      <div class="out">
+        <h5>Result</h5>
+        <div id="out-res" class="mat"></div>
+        <div class="cplx" id="out-cplx"></div>
+      </div>
+      <div class="trace" id="out-trace"></div>
+    </div>
+  </div>
+
+  <div class="box accent" style="margin-top:18px">
+    <h4>Use it like this</h4>
+    <p>Pick <b>ex10 row_echelon</b> and load the subject example. Read the row operations from top
+    to bottom and say each one out loud before you look at the matrix under it. Then switch to
+    <b>ex12 inverse</b> with the same matrix and watch the identity block on the right turn into
+    the answer. If you can narrate that trace without reading it, ex10 to ex13 are defended.</p>
+  </div>
+</section>
+
+<section id="run">
+  <h2><span class="n">06</span> Run and verify</h2>
+  <p class="lede">One command. It is both the test suite and the main function the subject asks for.</p>
+
+  <pre><code>$ python3 test_matrix.py
+OK: all matrix exercises (ex00-ex13) pass</code></pre>
+  <span class="src">Runs in about 0.03 seconds</span>
+
+  <p><code>test_matrix.py</code> asserts every worked example printed in the subject, at tolerance
+  <code>1e-4</code>. The subject requires a runnable main for each exercise; this file is that
+  main, and it is the thing to open in front of the evaluator, because each assertion is
+  immediately recognisable as an example from their copy of the subject.</p>
+
+  <h3>Results worth knowing cold</h3>
+  <div class="tablewrap">
+  <table>
+    <tr><th>Exercise</th><th>Input</th><th>Expected</th></tr>
+    <tr><td>ex03 dot</td><td><code>[-1, 6] &middot; [3, 2]</code></td><td><code>9</code></td></tr>
+    <tr><td>ex04 norms</td><td><code>[1, 2, 3]</code></td><td><code>6</code>, <code>3.7416574</code>, <code>3</code></td></tr>
+    <tr><td>ex05 cosine</td><td><code>[-1, 1]</code> and <code>[1, -1]</code></td><td><code>-1</code>, opposite directions</td></tr>
+    <tr><td>ex06 cross</td><td><code>[1,2,3] &times; [4,5,6]</code></td><td><code>[-3, 6, -3]</code></td></tr>
+    <tr><td>ex08 trace</td><td>the 3&times;3 in the subject</td><td><code>-21</code></td></tr>
+    <tr><td>ex11 det 3&times;3</td><td><code>[[8,5,-2],[4,7,20],[7,6,1]]</code></td><td><code>-174</code></td></tr>
+    <tr><td>ex11 det 4&times;4</td><td>the 4&times;4 in the subject</td><td><code>1032</code></td></tr>
+    <tr><td>ex13 rank</td><td><code>[[1,2,0,0],[2,4,0,0],[-1,2,1,1]]</code></td><td><code>2</code>, rows 1 and 2 are dependent</td></tr>
+  </table>
+  </div>
+
+  <p>The identity <code>det = 8</code> for <code>2I&#8323;</code> is the one to have ready as a
+  sanity check you can do in your head: scaling every axis by 2 in three dimensions multiplies
+  volume by <code>2&sup3;</code>. That single example ties the number to the geometry.</p>
+</section>
+
+<section id="defense">
+  <h2><span class="n">07</span> Eval defense</h2>
+  <p class="lede">Answer out loud first, then open the block.</p>
+  <p class="qa-hint">Two of these are not optional. The subject states in writing that you must be
+  able to explain what happens when <code>det(A) = 0</code>, what the determinant represents
+  geometrically, and what the rank represents. Expect the complexity of any exercise to be asked
+  as well, since the subject says complexities are checked at peer review.</p>
+
+  <details class="qa"><summary>What does the determinant represent geometrically?</summary>
+  <div class="answer">
+  <p>The signed factor by which the linear map scales volume. Push the unit cube through the
+  matrix and the determinant is the volume of the parallelepiped that comes out. In two dimensions
+  it is the area of the image of the unit square. The sign records orientation: a negative
+  determinant means the map mirrored space, turning a right-handed frame into a left-handed one.</p>
+  <p>Concrete check: <code>det(2I&#8323;) = 8</code>, because doubling all three axes multiplies
+  volume by eight.</p>
+  </div></details>
+
+  <details class="qa"><summary>What happens when det(A) = 0?</summary>
+  <div class="answer">
+  <p>The map collapses space into fewer dimensions, so volume becomes zero. A cube is flattened
+  into a sheet, or a sheet into a line. That collapse destroys information, and no map can undo
+  it, so <b>A has no inverse</b>. Five equivalent statements: the determinant is zero, the columns
+  are linearly dependent, the rank is less than <code>n</code>, <code>Ax = 0</code> has a nonzero
+  solution, and the inverse does not exist. In the code, <code>determinant()</code> returns
+  <code>0.0</code> early and <code>inverse()</code> raises
+  <code>ValueError('matrix is singular, no inverse')</code>.</p>
+  </div></details>
+
+  <details class="qa"><summary>What does the rank represent?</summary>
+  <div class="answer">
+  <p>The number of dimensions that survive the map: the dimension of the image, equivalently the
+  number of linearly independent columns, equivalently the number of independent rows. A 3&times;3
+  matrix of rank 2 maps all of space onto a plane. Counting the nonzero rows of the row echelon
+  form works because elimination preserves the row space and leaves exactly one row per
+  independent direction. The subject example <code>[[1,2,0,0],[2,4,0,0],[-1,2,1,1]]</code> has
+  rank 2, because the second row is exactly twice the first.</p>
+  </div></details>
+
+  <details class="qa"><summary>Why are row echelon, determinant, inverse and rank all O(n cubed)?</summary>
+  <div class="answer">
+  <p>All four are Gaussian elimination. There are <code>n</code> pivots; for each pivot you
+  update up to <code>n</code> rows; for each row you touch up to <code>n</code> columns. Three
+  nested loops of size <code>n</code> gives <code>n&sup3;</code>. Space is
+  <code>O(n&sup2;)</code>, because only one working copy of the matrix is alive at a time. The
+  inverse works on an <code>n &times; 2n</code> block, which is still <code>O(n&sup2;)</code>
+  since the constant 2 does not change the class.</p>
+  </div></details>
+
+  <details class="qa"><summary>Why does the determinant use partial pivoting rather than taking the first nonzero pivot?</summary>
+  <div class="answer">
+  <p>Numerical stability. Every elimination step subtracts <code>f = a[r][i]/a[i][i]</code> times
+  the pivot row. If the pivot is tiny, <code>f</code> is huge, and it amplifies whatever rounding
+  error is already there. Choosing the largest absolute pivot in the column keeps every
+  <code>|f| &le; 1</code>, so errors shrink rather than grow. It costs one extra scan of the
+  column and does not change the <code>O(n&sup3;)</code> class.</p>
+  </div></details>
+
+  <details class="qa"><summary>Why compare against EPS instead of testing equality with zero?</summary>
+  <div class="answer">
+  <p>Because floating point subtraction of two nearly equal numbers leaves dust rather than a
+  clean zero: something like <code>1e-17</code>, not <code>0.0</code>. An exact equality test
+  would treat that dust as a valid pivot, divide by it, and blow the matrix up by seventeen orders
+  of magnitude. <code>EPS = 1e-10</code> at <code>matrix.py:9</code> is the threshold below which a
+  value is treated as structurally zero.</p>
+  </div></details>
+
+  <details class="qa"><summary>What is the difference between row echelon form and reduced row echelon form, and which did you implement?</summary>
+  <div class="answer">
+  <p>Row echelon form only requires zeros below each pivot, and the pivots need not be 1. Reduced
+  row echelon form additionally requires each pivot to be exactly 1 and the rest of its column to
+  be zero <b>above as well as below</b>. This code implements the reduced form: it divides the
+  pivot row by the pivot, then eliminates over every row <code>i != r</code>, not just the ones
+  below. The subject's worked example expects the reduced form, and the reduced form is unique for
+  a given matrix, which is why it can be tested by comparison at all.</p>
+  </div></details>
+
+  <details class="qa"><summary>Why is the inverse computed on [A | I]?</summary>
+  <div class="answer">
+  <p>Every row operation is itself a matrix multiplication on the left. The sequence of operations
+  that reduces <code>A</code> to <code>I</code> is therefore some matrix <code>E</code> with
+  <code>EA = I</code>, which means <code>E = A&#8315;&sup1;</code>. Applying that same sequence to
+  the identity computes <code>EI = E</code>. So reducing the left block to the identity leaves the
+  inverse sitting in the right block, with no separate bookkeeping.</p>
+  </div></details>
+
+  <details class="qa"><summary>Which functions did you use, and does the subject allow them?</summary>
+  <div class="answer">
+  <p>The subject forbids any mathematical library including the standard one, and lists the
+  allowed functions per exercise. <code>matrix.py</code> has <b>no imports at all</b>.
+  <code>** 0.5</code> in <code>norm()</code> is <code>pow</code>, and <code>max</code> in
+  <code>norm_inf()</code> is <code>max</code>, both of which are explicitly allowed on ex04, the
+  only exercise that allows them. Elsewhere the arithmetic is <code>+ - * /</code>,
+  plus <code>abs</code> and the builtins <code>sum</code>, <code>zip</code> and
+  <code>max</code> used for selection rather than as a maths function. See the traps section for
+  the one place that is worth raising before the evaluator does.</p>
+  </div></details>
+
+  <details class="qa"><summary>Why is lerp one line, and why does it work on matrices as well as numbers?</summary>
+  <div class="answer">
+  <p><code>u + (v - u) * t</code> is written only in terms of addition, subtraction and scaling,
+  which are exactly the operations a vector space guarantees. <code>Vector</code> and
+  <code>Matrix</code> each define <code>__add__</code>, <code>__sub__</code> and
+  <code>__mul__</code>, and plain Python floats already have them, so the same line covers all
+  three. That is the generic implementation the subject asks for, expressed in Python's idiom
+  rather than Rust's.</p>
+  </div></details>
+
+  <details class="qa"><summary>What is the complexity of matrix multiplication and why?</summary>
+  <div class="answer">
+  <p><code>O(nmp)</code> time for an <code>m &times; n</code> matrix times an
+  <code>n &times; p</code> matrix: every one of the <code>m &times; p</code> output cells is a sum
+  over <code>n</code> terms. The subject sets space at
+  <code>O(nm + mp + np)</code>, which is the two inputs plus the output. The implementation at
+  <code>matrix.py:109</code> orders its loops <code>i, k, j</code> rather than
+  <code>i, j, k</code> so the pivot value <code>aik</code> is hoisted out of the inner loop, and
+  it writes into a preallocated output.</p>
+  </div></details>
+
+  <details class="qa"><summary>Why does the trace only make sense for a square matrix?</summary>
+  <div class="answer">
+  <p>The trace sums <code>a[i][i]</code>, which requires a diagonal, and only a square matrix has
+  one. Its deeper meaning is that it equals the sum of the eigenvalues, and unlike almost anything
+  else built from the entries it is unchanged by a change of basis, so it is a genuine property of
+  the linear map rather than of the particular grid of numbers.</p>
+  </div></details>
+
+  <details class="qa"><summary>Why is the cross product only defined in three dimensions?</summary>
+  <div class="answer">
+  <p>Because only in three dimensions is the space perpendicular to two independent vectors itself
+  one dimensional, so there is a single natural answer up to sign. In two dimensions the
+  perpendicular space is a line but there is no plane to span; in four, the perpendicular space is
+  two dimensional and no single vector is distinguished. The general construction that does
+  survive to all dimensions is the wedge product, which returns a plane element rather than a
+  vector.</p>
+  </div></details>
+
+  <details class="qa"><summary>Why does the subject cap the determinant at 4 by 4?</summary>
+  <div class="answer">
+  <p>To stop students from submitting the cofactor expansion, which is <code>O(n!)</code> and
+  becomes unusable almost immediately. Capping the size makes the exercise tractable either way,
+  while the stated <code>O(n&sup3;)</code> bound forces the elimination approach. This
+  implementation is elimination based, so it has no real size cap; the 4&times;4 limit is the
+  subject's, not the code's.</p>
+  </div></details>
+
+  <details class="qa"><summary>What is the cosine of the angle telling you that the dot product alone is not?</summary>
+  <div class="answer">
+  <p>The dot product mixes direction and magnitude: it grows if you simply make either vector
+  longer. Dividing by both norms cancels the magnitudes and leaves pure direction, always between
+  <code>-1</code> and <code>1</code>. <code>1</code> is the same direction, <code>0</code> is
+  perpendicular, <code>-1</code> is opposite, which is the subject's example with
+  <code>[-1, 1]</code> and <code>[1, -1]</code>.</p>
+  </div></details>
+
+  <details class="qa"><summary>How would you extend this to complex numbers, as bonus ex15 asks?</summary>
+  <div class="answer">
+  <p>Most of the module is already written against the operators rather than against floats, so a
+  <code>Complex</code> class defining <code>__add__</code>, <code>__sub__</code>,
+  <code>__mul__</code> and <code>__truediv__</code> would carry it. Two real changes are needed.
+  The constructors at <code>matrix.py:14</code> and <code>matrix.py:65</code> hard cast every
+  entry with <code>float(x)</code>, which would have to go, and that cast is the actual blocker.
+  And the dot product would need to conjugate the first argument, since over the complex numbers
+  the inner product is <code>&sum; conj(u&#7522;) v&#7522;</code>, otherwise
+  <code>&#8214;v&#8214;&sup2;</code> is no longer real and positive.</p>
+  </div></details>
+</section>
+
+<section id="traps">
+  <h2><span class="n">08</span> Traps</h2>
+  <p class="lede">This evaluation is failed on complexity and on forbidden functions, not on wrong answers.</p>
+
+  <div class="tablewrap">
+  <table>
+    <tr><th>Trap</th><th>Why it fails</th><th>Guard</th></tr>
+    <tr>
+      <td>Cofactor expansion for the determinant</td>
+      <td><code>O(n!)</code> against a stated bound of <code>O(n&sup3;)</code>. The commonest
+      failure in this module.</td>
+      <td><code>matrix.py:157</code> uses elimination</td>
+    </tr>
+    <tr>
+      <td>Importing anything mathematical</td>
+      <td>"You are not allowed to use any mathematical library, even the one included in your
+      language's standard library, unless explicitly stated otherwise."</td>
+      <td><code>matrix.py</code> has zero imports</td>
+    </tr>
+    <tr>
+      <td>Using <code>pow</code> or <code>max</code> outside ex04</td>
+      <td>The allowance is listed per exercise and only ex04 grants those two.</td>
+      <td>Only <code>norm()</code> and <code>norm_inf()</code> use them on values</td>
+    </tr>
+    <tr>
+      <td>Plain row echelon where the subject wants reduced</td>
+      <td>The worked example in the subject is reduced, so the output will not match.</td>
+      <td><code>matrix.py:149-152</code> eliminates over every row</td>
+    </tr>
+    <tr>
+      <td>Testing a pivot with <code>== 0</code></td>
+      <td>Floating point dust is treated as a pivot and the result explodes.</td>
+      <td><code>EPS</code> at <code>matrix.py:9</code>, used at every zero test</td>
+    </tr>
+    <tr>
+      <td>Returning a wrong answer for a singular matrix</td>
+      <td>The subject asks for an error result from <code>inverse()</code>.</td>
+      <td><code>matrix.py:182</code> raises <code>ValueError</code></td>
+    </tr>
+    <tr>
+      <td>Not having the det and rank explanations ready</td>
+      <td>The subject asks for them in writing, so they are guaranteed questions.</td>
+      <td>Section 7, first three blocks</td>
+    </tr>
+    <tr>
+      <td>Recomputing elimination inside <code>rank()</code></td>
+      <td>Not a failure, but it hides that you saw ex10 and ex13 are the same computation.</td>
+      <td><code>rank()</code> calls <code>row_echelon()</code></td>
+    </tr>
+  </table>
+  </div>
+
+  <div class="box warn">
+    <h4>Two honest weak points to raise yourself</h4>
+    <p><b>1. <code>max</code> with a key inside determinant and inverse.</b>
+    <code>matrix.py:162</code> and <code>matrix.py:180</code> use
+    <code>max(range(i, n), key=lambda r: abs(a[r][i]))</code> to select the pivot row. Only ex04
+    lists <code>max</code> as an allowed mathematical function. The defence is that this is
+    Python's generic selection builtin choosing an index, not a mathematical operation on values,
+    and that it can be replaced by a three-line loop with no change in complexity. Say it before
+    the evaluator finds it, and offer the loop.</p>
+    <p><b>2. The float cast blocks genericity.</b> <code>matrix.py:14</code> and
+    <code>matrix.py:65</code> call <code>float(x)</code> on every entry. The subject asks for an
+    implementation generic in <code>K</code>, and this pins <code>K</code> to the reals. For the
+    mandatory part, where <code>K = f32</code>, it is fine and the subject only requires the reals.
+    It is the one line that would have to be removed for bonus ex15.</p>
+  </div>
+
+  <div class="box">
+    <h4>The column-major footnote</h4>
+    <p>The subject says: "Unless specified otherwise, all matrices shown in the examples are in
+    column-major order." This code stores and prints row-major, and the worked examples still
+    match, because the subject's own examples are laid out so that reading them the natural way
+    gives the expected results. Be ready to state which convention you store in, since a confused
+    evaluator may ask.</p>
+  </div>
+</section>
+
+<section id="checklist">
+  <h2><span class="n">09</span> Mastery checklist</h2>
+  <p class="lede">Tick a line only after you can say it out loud with no notes. Progress is saved in this browser.</p>
+
+  <div class="check">
+    <div class="bar"><i id="bar-fill"></i></div>
+    <div class="check-head">
+      <span class="prog" id="prog-text">0 of 14 ready</span>
+      <button id="btn-clear">Reset</button>
+    </div>
+    <ul id="check-list">
+      <li><label><input type="checkbox" data-k="m1"><span>I can state the time and space bound of every exercise from ex00 to ex13.</span></label></li>
+      <li><label><input type="checkbox" data-k="m2"><span>I can explain the determinant geometrically, with the 2I example.</span></label></li>
+      <li><label><input type="checkbox" data-k="m3"><span>I can give all five equivalent statements of det(A) = 0.</span></label></li>
+      <li><label><input type="checkbox" data-k="m4"><span>I can explain what the rank represents and why counting nonzero rows finds it.</span></label></li>
+      <li><label><input type="checkbox" data-k="m5"><span>I can narrate a full RREF trace without reading it.</span></label></li>
+      <li><label><input type="checkbox" data-k="m6"><span>I can explain why ex10 to ex13 are one algorithm.</span></label></li>
+      <li><label><input type="checkbox" data-k="m7"><span>I can justify partial pivoting as numerical stability, not decoration.</span></label></li>
+      <li><label><input type="checkbox" data-k="m8"><span>I can explain why EPS exists and what breaks without it.</span></label></li>
+      <li><label><input type="checkbox" data-k="m9"><span>I can explain why the inverse is computed on [A | I].</span></label></li>
+      <li><label><input type="checkbox" data-k="m10"><span>I can name the allowed functions per exercise and where the code uses them.</span></label></li>
+      <li><label><input type="checkbox" data-k="m11"><span>I can raise the max-with-key point myself and offer the loop replacement.</span></label></li>
+      <li><label><input type="checkbox" data-k="m12"><span>I can explain why lerp is generic and one line.</span></label></li>
+      <li><label><input type="checkbox" data-k="m13"><span>I can explain why the cross product only exists in three dimensions.</span></label></li>
+      <li><label><input type="checkbox" data-k="m14"><span>I can describe exactly what ex15 would require, including the float cast.</span></label></li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <p>Guide for <code>matrix</code>, 42 Abu Dhabi. Complexity bounds and allowed-function lists are
+  quoted from the subject, version 1.2. Every worked example was run against the code in this
+  repository. The evaluation questions are inferred from the subject and the implementation,
+  except the determinant and rank explanations, which the subject demands by name.</p>
+</footer>
+
+</main>
+
+<script>
+"use strict";
+
+var EPS = 1e-10;
+var el = function (id) { return document.getElementById(id); };
+
+/* ---- parsing and formatting ---- */
+function parseMatrix(text) {
+  var rows = text.trim().split(/\n+/).map(function (line) {
+    return line.trim().split(/[\s,]+/).filter(function (s) { return s.length; }).map(Number);
+  });
+  if (!rows.length || rows.some(function (r) { return !r.length; })) throw new Error("empty input");
+  if (rows.some(function (r) { return r.some(isNaN); })) throw new Error("not a number");
+  var w = rows[0].length;
+  if (rows.some(function (r) { return r.length !== w; })) throw new Error("rows have different lengths");
+  return rows;
+}
+function parseVector(text) {
+  var v = text.trim().split(/[\s,\n]+/).filter(function (s) { return s.length; }).map(Number);
+  if (!v.length || v.some(isNaN)) throw new Error("not a list of numbers");
+  return v;
+}
+function parseScalar(text) {
+  var x = Number(text.trim());
+  if (isNaN(x)) throw new Error("not a number");
+  return x;
+}
+function fmt(x) {
+  if (Math.abs(x) < EPS) x = 0;
+  var s = (Math.round(x * 1e6) / 1e6).toString();
+  return s;
+}
+function matHTML(rows, pivots) {
+  var w = [];
+  rows.forEach(function (r) {
+    r.forEach(function (x, j) { w[j] = Math.max(w[j] || 0, fmt(x).length); });
+  });
+  return rows.map(function (r, i) {
+    var cells = r.map(function (x, j) {
+      var s = fmt(x);
+      while (s.length < w[j]) s = " " + s;
+      var isP = pivots && pivots.some(function (p) { return p[0] === i && p[1] === j; });
+      return isP ? '<span class="piv">' + s + "</span>" : s;
+    });
+    return '<div class="row">[ ' + cells.join("  ") + " ]</div>";
+  }).join("");
+}
+function vecHTML(v) { return matHTML(v.map(function (x) { return [x]; })); }
+function scalarHTML(x) { return '<div class="row">' + fmt(x) + "</div>"; }
+
+/* ---- ports of matrix.py ---- */
+function copy(a) { return a.map(function (r) { return r.slice(); }); }
+
+function rowEchelon(a, trace) {
+  a = copy(a);
+  var rows = a.length, cols = a[0].length, lead = 0;
+  for (var r = 0; r < rows; r++) {
+    if (lead >= cols) break;
+    var i = r;
+    while (Math.abs(a[i][lead]) < EPS) {
+      i++;
+      if (i === rows) {
+        i = r;
+        lead++;
+        if (lead === cols) return a;
+      }
+    }
+    if (i !== r) {
+      var t = a[i]; a[i] = a[r]; a[r] = t;
+      if (trace) trace.push({ op: "swap R" + (r + 1) + " and R" + (i + 1), m: copy(a), piv: [[r, lead]] });
+    }
+    var piv = a[r][lead];
+    if (Math.abs(piv - 1) > EPS) {
+      a[r] = a[r].map(function (x) { return x / piv; });
+      if (trace) trace.push({ op: "R" + (r + 1) + " / " + fmt(piv) + "  (make the pivot 1)", m: copy(a), piv: [[r, lead]] });
+    }
+    var changed = [];
+    for (i = 0; i < rows; i++) {
+      if (i !== r) {
+        var f = a[i][lead];
+        if (Math.abs(f) > EPS) {
+          a[i] = a[i].map(function (x, c) { return x - f * a[r][c]; });
+          changed.push("R" + (i + 1) + " - (" + fmt(f) + ")R" + (r + 1));
+        }
+      }
+    }
+    if (trace && changed.length) {
+      trace.push({ op: changed.join(",  ") + "   (clear column " + (lead + 1) + ")", m: copy(a), piv: [[r, lead]] });
+    }
+    lead++;
+  }
+  return a;
+}
+
+function determinant(a, trace) {
+  a = copy(a);
+  var n = a.length, det = 1;
+  for (var i = 0; i < n; i++) {
+    var p = i;
+    for (var r = i + 1; r < n; r++) if (Math.abs(a[r][i]) > Math.abs(a[p][i])) p = r;
+    if (Math.abs(a[p][i]) < EPS) {
+      if (trace) trace.push({ op: "column " + (i + 1) + " has no usable pivot, the matrix is singular", m: copy(a) });
+      return 0;
+    }
+    if (p !== i) {
+      var t = a[i]; a[i] = a[p]; a[p] = t;
+      det = -det;
+      if (trace) trace.push({ op: "swap R" + (i + 1) + " and R" + (p + 1) + "   (partial pivoting, sign flips: det = " + fmt(det) + ")", m: copy(a), piv: [[i, i]] });
+    }
+    det *= a[i][i];
+    if (trace) trace.push({ op: "multiply by pivot " + fmt(a[i][i]) + "   (running det = " + fmt(det) + ")", m: copy(a), piv: [[i, i]] });
+    var ops = [];
+    for (r = i + 1; r < n; r++) {
+      var f = a[r][i] / a[i][i];
+      if (Math.abs(f) > EPS) {
+        for (var c = i; c < n; c++) a[r][c] -= f * a[i][c];
+        ops.push("R" + (r + 1) + " - (" + fmt(f) + ")R" + (i + 1));
+      }
+    }
+    if (trace && ops.length) trace.push({ op: ops.join(",  ") + "   (clear below the pivot)", m: copy(a), piv: [[i, i]] });
+  }
+  return det;
+}
+
+function inverse(a, trace) {
+  var n = a.length;
+  var aug = a.map(function (row, i) {
+    return row.slice().concat(row.map(function (_, j) { return j === i ? 1 : 0; }));
+  });
+  for (var i = 0; i < n; i++) {
+    var p = i;
+    for (var r = i + 1; r < n; r++) if (Math.abs(aug[r][i]) > Math.abs(aug[p][i])) p = r;
+    if (Math.abs(aug[p][i]) < EPS) throw new Error("matrix is singular, no inverse");
+    if (p !== i) {
+      var t = aug[i]; aug[i] = aug[p]; aug[p] = t;
+      if (trace) trace.push({ op: "swap R" + (i + 1) + " and R" + (p + 1), m: copy(aug), piv: [[i, i]] });
+    }
+    var piv = aug[i][i];
+    if (Math.abs(piv - 1) > EPS) {
+      aug[i] = aug[i].map(function (x) { return x / piv; });
+      if (trace) trace.push({ op: "R" + (i + 1) + " / " + fmt(piv) + "  (make the pivot 1)", m: copy(aug), piv: [[i, i]] });
+    }
+    var ops = [];
+    for (r = 0; r < n; r++) {
+      if (r !== i) {
+        var f = aug[r][i];
+        if (Math.abs(f) > EPS) {
+          aug[r] = aug[r].map(function (x, c) { return x - f * aug[i][c]; });
+          ops.push("R" + (r + 1) + " - (" + fmt(f) + ")R" + (i + 1));
+        }
+      }
+    }
+    if (trace && ops.length) trace.push({ op: ops.join(",  ") + "   (clear column " + (i + 1) + ")", m: copy(aug), piv: [[i, i]] });
+  }
+  return aug.map(function (row) { return row.slice(n); });
+}
+
+function mulMat(A, B) {
+  var m = A.length, n = A[0].length, p = B[0].length;
+  if (B.length !== n) throw new Error("shapes do not match: A is " + m + "x" + n + ", B is " + B.length + "x" + p);
+  var out = [];
+  for (var i = 0; i < m; i++) {
+    out.push(new Array(p).fill(0));
+    for (var k = 0; k < n; k++) {
+      var aik = A[i][k];
+      for (var j = 0; j < p; j++) out[i][j] += aik * B[k][j];
+    }
+  }
+  return out;
+}
+
+/* ---- operation table ---- */
+var OPS = [
+  { id: "add", name: "ex00  add (vectors)", kind: "vv", cplx: "O(n) time, O(n) space",
+    hint: "Two vectors of the same size, one number per line or space separated.",
+    a: "2 3", b: "5 7",
+    run: function (u, v) { return vecHTML(u.map(function (x, i) { return x + v[i]; })); } },
+  { id: "sub", name: "ex00  sub (vectors)", kind: "vv", cplx: "O(n) time, O(n) space",
+    hint: "Two vectors of the same size.", a: "2 3", b: "5 7",
+    run: function (u, v) { return vecHTML(u.map(function (x, i) { return x - v[i]; })); } },
+  { id: "scl", name: "ex00  scl (vector by scalar)", kind: "vt", cplx: "O(n) time, O(n) space",
+    hint: "A vector in A and a single number in the scalar box.", a: "2 3", t: "2",
+    run: function (u, _, t) { return vecHTML(u.map(function (x) { return x * t; })); } },
+  { id: "madd", name: "ex00  add (matrices)", kind: "mm", cplx: "O(n) time, O(n) space",
+    hint: "Two matrices of the same shape, one row per line.",
+    a: "1 2\n3 4", b: "7 4\n-2 2",
+    run: function (A, B) { return matHTML(A.map(function (r, i) { return r.map(function (x, j) { return x + B[i][j]; }); })); } },
+  { id: "lincomb", name: "ex01  linear_combination", kind: "mv", cplx: "O(n) time, O(n) space",
+    hint: "One vector per line in A, and the coefficients in B.",
+    a: "1 0 0\n0 1 0\n0 0 1", b: "10 -2 0.5",
+    run: function (vs, coefs) {
+      if (vs.length !== coefs.length) throw new Error("need one coefficient per vector");
+      var out = new Array(vs[0].length).fill(0);
+      vs.forEach(function (v, k) { v.forEach(function (x, i) { out[i] += x * coefs[k]; }); });
+      return vecHTML(out);
+    } },
+  { id: "lerp", name: "ex02  lerp (vectors)", kind: "vvt", cplx: "O(n) time, O(n) space",
+    hint: "Two vectors and t in the scalar box. t = 0 gives A, t = 1 gives B.",
+    a: "2 1", b: "4 2", t: "0.3",
+    run: function (u, v, t) { return vecHTML(u.map(function (x, i) { return x + (v[i] - x) * t; })); } },
+  { id: "dot", name: "ex03  dot", kind: "vv", cplx: "O(n) time, O(n) space",
+    hint: "Two vectors of the same size.", a: "-1 6", b: "3 2",
+    run: function (u, v) { return scalarHTML(u.reduce(function (s, x, i) { return s + x * v[i]; }, 0)); } },
+  { id: "norms", name: "ex04  norm_1, norm, norm_inf", kind: "v", cplx: "O(n) time, O(n) space",
+    hint: "One vector in A. The only exercise where pow and max are allowed.", a: "1 2 3",
+    run: function (u) {
+      var n1 = u.reduce(function (s, x) { return s + Math.abs(x); }, 0);
+      var n2 = Math.pow(u.reduce(function (s, x) { return s + x * x; }, 0), 0.5);
+      var ni = u.reduce(function (s, x) { return Math.max(s, Math.abs(x)); }, 0);
+      return '<div class="row">norm_1   = ' + fmt(n1) + "</div>"
+           + '<div class="row">norm     = ' + fmt(n2) + "</div>"
+           + '<div class="row">norm_inf = ' + fmt(ni) + "</div>";
+    } },
+  { id: "cos", name: "ex05  angle_cos", kind: "vv", cplx: "O(n) time, O(n) space",
+    hint: "Two vectors. The result is always between -1 and 1.", a: "-1 1", b: "1 -1",
+    run: function (u, v) {
+      var d = u.reduce(function (s, x, i) { return s + x * v[i]; }, 0);
+      var nu = Math.pow(u.reduce(function (s, x) { return s + x * x; }, 0), 0.5);
+      var nv = Math.pow(v.reduce(function (s, x) { return s + x * x; }, 0), 0.5);
+      return scalarHTML(d / (nu * nv));
+    } },
+  { id: "cross", name: "ex06  cross_product", kind: "vv", cplx: "no bound stated",
+    hint: "Two vectors, exactly three components each.", a: "1 2 3", b: "4 5 6",
+    run: function (u, v) {
+      if (u.length !== 3 || v.length !== 3) throw new Error("the cross product needs two 3D vectors");
+      return vecHTML([u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]]);
+    } },
+  { id: "mulvec", name: "ex07  mul_vec", kind: "mv", cplx: "O(nm) time, O(nm) space",
+    hint: "A matrix in A, one row per line, and a vector in B.",
+    a: "2 -2\n-2 2", b: "4 2",
+    run: function (A, v) {
+      if (A[0].length !== v.length) throw new Error("the vector must have one entry per column of A");
+      return vecHTML(A.map(function (r) { return r.reduce(function (s, x, i) { return s + x * v[i]; }, 0); }));
+    } },
+  { id: "mulmat", name: "ex07  mul_mat", kind: "mm", cplx: "O(nmp) time, O(nm + mp + np) space",
+    hint: "Two matrices. The columns of A must match the rows of B.",
+    a: "3 -5\n6 8", b: "2 1\n4 2",
+    run: function (A, B) { return matHTML(mulMat(A, B)); } },
+  { id: "trace", name: "ex08  trace", kind: "m", cplx: "O(n) time, no space bound",
+    hint: "A square matrix.", a: "-2 -8 4\n1 -23 4\n0 6 4",
+    run: function (A) {
+      if (A.length !== A[0].length) throw new Error("the trace needs a square matrix");
+      return scalarHTML(A.reduce(function (s, r, i) { return s + r[i]; }, 0));
+    } },
+  { id: "transpose", name: "ex09  transpose", kind: "m", cplx: "O(nm) time, O(nm) space",
+    hint: "Any matrix.", a: "1 2 3\n4 5 6",
+    run: function (A) {
+      return matHTML(A[0].map(function (_, j) { return A.map(function (r) { return r[j]; }); }));
+    } },
+  { id: "rref", name: "ex10  row_echelon (traced)", kind: "m", cplx: "O(n³) time, O(n²) space", traced: true,
+    hint: "Any matrix. Every row operation is listed below the result.",
+    a: "8 5 -2 4 28\n4 2.5 20 4 -4\n8 5 1 4 17",
+    run: function (A, _, __, trace) { return matHTML(rowEchelon(A, trace)); } },
+  { id: "det", name: "ex11  determinant (traced)", kind: "m", cplx: "O(n³) time, O(n²) space", traced: true,
+    hint: "A square matrix. The subject caps this at 4 by 4.",
+    a: "8 5 -2\n4 7 20\n7 6 1",
+    run: function (A, _, __, trace) {
+      if (A.length !== A[0].length) throw new Error("the determinant needs a square matrix");
+      return scalarHTML(determinant(A, trace));
+    } },
+  { id: "inverse", name: "ex12  inverse (traced)", kind: "m", cplx: "O(n³) time, O(n²) space", traced: true,
+    hint: "A square, non-singular matrix. The trace shows the augmented block [A | I].",
+    a: "8 5 -2\n4 7 20\n7 6 1",
+    run: function (A, _, __, trace) {
+      if (A.length !== A[0].length) throw new Error("the inverse needs a square matrix");
+      return matHTML(inverse(A, trace));
+    } },
+  { id: "rank", name: "ex13  rank (traced)", kind: "m", cplx: "O(n³) time, no space bound", traced: true,
+    hint: "Any matrix. Rank is the number of nonzero rows left after elimination.",
+    a: "1 2 0 0\n2 4 0 0\n-1 2 1 1",
+    run: function (A, _, __, trace) {
+      var ref = rowEchelon(A, trace);
+      var k = ref.filter(function (r) { return r.some(function (x) { return Math.abs(x) > EPS; }); }).length;
+      return '<div class="row">rank = ' + k + "</div>";
+    } }
+];
+
+/* ---- wiring ---- */
+var sel = el("op");
+OPS.forEach(function (o, i) {
+  var opt = document.createElement("option");
+  opt.value = String(i);
+  opt.textContent = o.name;
+  sel.appendChild(opt);
+});
+
+function current() { return OPS[Number(sel.value)]; }
+
+function syncInputs() {
+  var o = current();
+  var k = o.kind;
+  var needB = k === "vv" || k === "mm" || k === "mv" || k === "vvt";
+  var needT = k === "vt" || k === "vvt";
+  el("hint").textContent = o.hint;
+  el("in-b").parentNode.style.display = needB ? "" : "none";
+  el("wrap-t").style.display = needT ? "" : "none";
+  el("lab-a").textContent = (k[0] === "m" ? "Matrix A" : "Vector A");
+  el("lab-b").textContent = (o.id === "lincomb" ? "Coefficients" : (k === "mv" ? "Vector B" : (k[1] === "m" ? "Matrix B" : "Vector B")));
+  el("out-cplx").textContent = "Subject bound: " + o.cplx;
+}
+
+function loadExample() {
+  var o = current();
+  el("in-a").value = o.a || "";
+  el("in-b").value = o.b || "";
+  el("in-t").value = o.t || "1";
+  syncInputs();
+  compute();
+}
+
+function compute() {
+  var o = current(), res = el("out-res"), tr = el("out-trace");
+  tr.innerHTML = "";
+  try {
+    var k = o.kind;
+    var A = k[0] === "m" || o.id === "lincomb" ? parseMatrix(el("in-a").value) : parseVector(el("in-a").value);
+    var B = null;
+    if (k === "vv" || k === "vvt") B = parseVector(el("in-b").value);
+    else if (k === "mm") B = parseMatrix(el("in-b").value);
+    else if (k === "mv") B = parseVector(el("in-b").value);
+    var t = (k === "vt" || k === "vvt") ? parseScalar(el("in-t").value) : null;
+    var trace = o.traced ? [] : null;
+    res.innerHTML = o.run(A, B, t, trace);
+    if (trace && trace.length) {
+      tr.innerHTML = '<h5 style="margin:14px 0 0;font:600 11px/1 var(--mono);'
+        + 'text-transform:uppercase;letter-spacing:.06em;color:var(--muted)">'
+        + "Row operations, in order</h5>"
+        + trace.map(function (s, i) {
+            return '<div class="step"><div class="op">' + (i + 1) + ".  " + s.op
+                 + '</div><div class="mat">' + matHTML(s.m, s.piv) + "</div></div>";
+          }).join("");
+    }
+  } catch (err) {
+    res.innerHTML = '<div class="err">' + err.message + "</div>";
+  }
+}
+
+sel.addEventListener("change", loadExample);
+el("btn-go").addEventListener("click", compute);
+el("btn-example").addEventListener("click", loadExample);
+sel.value = "14";   /* ex10 row_echelon, the traced one worth opening on */
+loadExample();
+
+/* ---- checklist ---- */
+var KEY = "guide:matrix:checklist";
+var boxes = Array.prototype.slice.call(document.querySelectorAll("#check-list input"));
+function loadState() {
+  try { return JSON.parse(localStorage.getItem(KEY) || "{}"); }
+  catch (err) { return {}; }
+}
+function saveState(s) {
+  try { localStorage.setItem(KEY, JSON.stringify(s)); }
+  catch (err) { /* file:// origins may refuse storage; the page still works */ }
+}
+function refreshProgress() {
+  var done = boxes.filter(function (b) { return b.checked; }).length;
+  el("prog-text").textContent = done + " of " + boxes.length + " ready";
+  el("bar-fill").style.width = (done / boxes.length * 100) + "%";
+}
+var state = loadState();
+boxes.forEach(function (b) {
+  b.checked = !!state[b.dataset.k];
+  b.addEventListener("change", function () {
+    var s = loadState();
+    s[b.dataset.k] = b.checked;
+    saveState(s);
+    refreshProgress();
+  });
+});
+refreshProgress();
+el("btn-clear").addEventListener("click", function () {
+  boxes.forEach(function (b) { b.checked = false; });
+  saveState({});
+  refreshProgress();
+});
+
+/* ---- nav highlight ---- */
+var links = Array.prototype.slice.call(document.querySelectorAll("nav.toc a"));
+var sections = links.map(function (a) { return document.querySelector(a.getAttribute("href")); });
+window.addEventListener("scroll", function () {
+  var y = window.scrollY + 90, active = 0;
+  for (var i = 0; i < sections.length; i++) {
+    if (sections[i] && sections[i].offsetTop <= y) active = i;
+  }
+  links.forEach(function (a, i) { a.className = i === active ? "on" : ""; });
+}, { passive: true });
+</script>
+</body>
+</html>
